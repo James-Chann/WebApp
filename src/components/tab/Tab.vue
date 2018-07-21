@@ -29,16 +29,15 @@ export default {
     height: 35px
     line-height: 35px
     font-size: $font-size-medium
-    margin-bottom 15px
+    margin-bottom 2px
   /*===tab栏子项公共样式===============================================================================================================================*/
     .tab-item
       flex 1
       text-align center
       .tab-link
-        margin 0 25px
         color: $color-text-l
     &.router-link-active
       .tab-link
-        color: $color-theme
+        color: $color-text
         border-bottom: 2px solid $color-theme
 </style>

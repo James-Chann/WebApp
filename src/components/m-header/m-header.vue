@@ -1,9 +1,9 @@
 <template>
   <div class="header">
     <!--头部图片-->
-    <div class="header-icon"></div>
+    <!-- <div class="header-icon"></div> -->
     <!--头部标题-->
-    <div class="header-txt">Chicken Music</div>
+    <div class="header-txt">JamesChan Music</div>
   </div>
 </template>
 
@@ -23,19 +23,20 @@ export default {
     line-height 44px
     text-align center
     font-size 0
+    background $color-theme
   /*===头部图片==================================================================================================================================================*/
     .header-icon
         display inline-block
         width 30px
         height 32px
-        margin-right 9px
+        margin-left 7px
         vertical-align middle
         background-size 30px 32px
-        bg-image('logo')
+        // bg-image('logo')
   /*===头部标题==================================================================================================================================================*/
     .header-txt
         display inline-block
-        color: $color-theme
+        color: $color-text
         font-size: $font-size-large
         vertical-align middle
 </style>
