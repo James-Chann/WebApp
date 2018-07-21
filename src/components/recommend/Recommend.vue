@@ -71,16 +71,19 @@ export default {
     }
   },
   methods: {
-    // 获取数据
+    // 获取轮播数据
     getRecommendSucc (res) {
       if (res.code === ERR_OK) {
         console.log(res)
         this.recommends = res.data.slider
       }
     },
+    // 获取推荐歌单数据
     getPlayListSucc (res) {
       console.log(res)
-      this.songList = res.songlist
+      if (res.code === ERR_OK) {
+        this.songList = res.songlist
+      }
     }
   },
   created () {

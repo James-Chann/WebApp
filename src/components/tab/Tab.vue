@@ -3,15 +3,15 @@
     <router-link tag="div" to="/recommend" class="tab-item tab-recommend">
       <div class="tab-link">推荐</div>
     </router-link>
-    <router-link tag="div" to="/singer" class="tab-item tab-singer">
-      <div class="tab-link">歌手</div>
+    <router-link tag="div" to="/latest" class="tab-item tab-singer">
+      <div class="tab-link">最新歌曲</div>
     </router-link>
     <router-link tag="div" to="/rank" class="tab-item tab-rank">
       <div class="tab-link">排名</div>
     </router-link>
-    <router-link tag="div" to="/search" class="tab-item tab-search">
+    <!-- <router-link tag="div" to="/search" class="tab-item tab-search">
       <div class="tab-link">搜索</div>
-    </router-link>
+    </router-link> -->
   </div>
 </template>
 
