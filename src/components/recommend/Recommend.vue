@@ -28,11 +28,11 @@
           <ul class="list-cont">
             <li class="list-cont-item" v-for="(item, index) in songList" :key="index">
               <div class="item-left">
-                <img class="left-img" v-lazy="'http://imgcache.qq.com/music/photo/album_300/'+(item.data.albumid%100)+'/300_albumpic_'+item.data.albumid+'_0.jpg'" alt="">
+                <img class="left-img" v-lazy="item.imgurl" alt="">
               </div>
               <div class="item-right">
-                <h2 class="item-right-name">{{item.data.albumname}}</h2>
-                <p class="item-right-desc">{{item.data.albumdesc}}</p>
+                <h2 class="item-right-name" v-html="item.creator.name"></h2>
+                <p class="item-right-desc" v-html="item.dissname"></p>
               </div>
             </li>
           </ul>
@@ -50,7 +50,7 @@
 <script>
 import Bscroll from 'better-scroll'
 import Loading from 'base/loading/loading'
-import {getRecommend, getPlayList} from 'api/recommend'
+import {getRecommend, getDiscList} from 'api/recommend'
 import {ERR_OK} from 'api/config'
 export default {
   name: 'Recommend',
@@ -74,21 +74,20 @@ export default {
     // 获取轮播数据
     getRecommendSucc (res) {
       if (res.code === ERR_OK) {
-        console.log(res)
         this.recommends = res.data.slider
       }
     },
     // 获取推荐歌单数据
-    getPlayListSucc (res) {
+    getDiscListSucc (res) {
       console.log(res)
       if (res.code === ERR_OK) {
-        this.songList = res.songlist
+        this.songList = res.data.list
       }
     }
   },
   created () {
     getRecommend().then(this.getRecommendSucc)
-    getPlayList().then(this.getPlayListSucc)
+    getDiscList().then(this.getDiscListSucc)
   },
   mounted () {
     this.scroll = new Bscroll(this.$refs.wraper, {
@@ -157,7 +156,6 @@ export default {
             .item-right-desc
               color $color-text-d
               font-size 14px
-              text-indent  -5px
       /*歌单列表加载组件*/
       .loading-song
         padding-top 200px

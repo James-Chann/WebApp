@@ -5,11 +5,11 @@
         <!--歌单标题区域-->
         <div class="latest-wraper">
           <!--标题图片模拟背景图片-->
-          <img v-if="songList.length" class="latest-titleBg" :src="'http://imgcache.qq.com/music/photo/album_300/'+(songList[8].data.albumid%100)+'/300_albumpic_'+songList[8].data.albumid+'_0.jpg'" alt="">
+          <img v-if="songList.length" class="latest-titleBg" :src="'http://imgcache.qq.com/music/photo/album_300/'+(songList[20].data.albumid%100)+'/300_albumpic_'+songList[20].data.albumid+'_0.jpg'" alt="">
           <!--标题文字图片内容-->
           <div class="latest-title" v-if="songList.length">
             <div class="title-left">
-              <img class="left-img" :src="'http://imgcache.qq.com/music/photo/album_300/'+(songList[8].data.albumid%100)+'/300_albumpic_'+songList[8].data.albumid+'_0.jpg'" alt="">
+              <img class="left-img" :src="'http://imgcache.qq.com/music/photo/album_300/'+(songList[20].data.albumid%100)+'/300_albumpic_'+songList[20].data.albumid+'_0.jpg'" alt="">
             </div>
             <div class="title-right">
               <div class="right-title">{{songList[8].data.songname}}</div>
@@ -45,6 +45,10 @@
               <p class="item-desc">{{item.data.albumdesc || '微小而确辛的幸福'}}</p>
             </li>
           </ul>
+           <!--歌单列表加载组件-->
+          <div class="loading-song" v-if="!songList.length">
+            <loading></loading>
+          </div>
         </div>
       </div>
     </div>
@@ -53,10 +57,14 @@
 
 <script>
 import Bscroll from 'better-scroll'
+import Loading from 'base/loading/loading'
 import {getLatest} from 'api/latest'
 import {ERR_OK} from 'api/config'
 export default {
   name: 'Singer',
+  components: {
+    Loading
+  },
   data () {
     return {
       songList: [],
@@ -195,4 +203,7 @@ export default {
           font-size 14px
           no-wrap()
           overflow hidden
+    /*加载loading*/
+    .loading-song
+      padding-top 200px
 </style>

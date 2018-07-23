@@ -10,7 +10,22 @@ module.exports = {
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
+    proxyTable: {
+      // 待定的请求代理
+      '/api/getDiscList': {
+        // 接口域名
+        target: 'https://c.y.qq.com/splcloud/fcgi-bin/fcg_get_diss_by_tag.fcg',
+        // 请求头设置
+        bypass: function (req, res, proxyOptions) {
+          req.headers.referer = 'https://y.qq.com'
+        },
+        // 接口跨域设置为true
+        changeOrigin: true,
+        pathRewrite: {
+          '^/api/getDiscList': ''
+        }
+      }
+    },
 
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST
