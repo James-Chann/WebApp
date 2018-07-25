@@ -56,6 +56,9 @@ export default {
     Loading
   },
   methods: {
+    selectItem (item) {
+      this.$emit('select', item)
+    },
     charClick (e, index) {
       // this.chars = e.target.innerText
       let singerKindList = (this.$refs.singerKindList).getElementsByClassName('list-group')

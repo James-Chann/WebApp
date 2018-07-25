@@ -5,18 +5,21 @@
     <keep-alive>
       <router-view></router-view>
     </keep-alive>
+    <player></player>
   </div>
 </template>
 
 <script>
 import MHeader from 'components/m-header/m-header'
 import Tab from 'components/tab/Tab'
+import Player from 'components/player/Player'
 
 export default {
   name: 'App',
   components: {
     MHeader,
-    Tab
+    Tab,
+    Player
   }
 }
 </script>
