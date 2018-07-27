@@ -1,10 +1,10 @@
 <template>
   <div class="progress-bar">
-    <div class="bar-inner" ref="barTotalWidth">
+    <div class="bar-inner" ref="barTotalWidth" @click="changePlay">
       <!--进度条播放宽度-->
       <div class="progress" ref="barPlayWidth"></div>
       <!--小球按钮-->
-      <div class="progress-btn-wrapper" ref="barBtn">
+      <div class="progress-btn-wrapper" ref="barBtn" @touchstart.prevent="barBtnTouchStrat" @touchmove.prevent="barBtnTouchMove" @touchend.prevent="barBtnTouchEnd">
         <div class="progress-btn"></div>
       </div>
     </div>
@@ -20,13 +20,49 @@ export default {
       default: 0
     }
   },
+  methods: {
+    barBtnTouchStrat (e) {
+      this.touchs.initStatus = true
+      this.touchs.startX = e.touches[0].pageX
+      const barTotal = this.$refs.barTotalWidth
+      this.touchs.progressMoveDistance = this.percent * barTotal.offsetWidth
+    },
+    barBtnTouchMove (e) {
+      if (this.touchs.initStatus) {
+        let moveDistance = e.touches[0].pageX - this.touchs.startX + this.touchs.progressMoveDistance
+        let countMoveDistance = Math.min(Math.max(0, moveDistance), this.$refs.barTotalWidth.offsetWidth)
+        console.log(countMoveDistance)
+        this.getMoveWidth(countMoveDistance)
+        let movePrecent = countMoveDistance / this.$refs.barTotalWidth.offsetWidth
+        this.$emit('dragmove', movePrecent)
+      }
+    },
+    barBtnTouchEnd () {
+      this.touchs.initStatus = false
+    },
+    changePlay (e) {
+      const rect = this.$refs.barTotalWidth.getBoundingClientRect()
+      const setWidth = e.pageX - rect.left
+      this.getMoveWidth(setWidth)
+      let movePrecent = setWidth / this.$refs.barTotalWidth.offsetWidth
+      this.$emit('dragmove', movePrecent)
+    },
+    getMoveWidth (num) {
+      this.$refs.barPlayWidth.style.width = `${num}px`
+      this.$refs.barBtn.style.transform = `translateX(${num}px)`
+    }
+  },
   watch: {
     percent (newPercent) {
-      const barTotal = this.$refs.barTotalWidth
-      let moveWidth = newPercent * barTotal.offsetWidth
-      this.$refs.barPlayWidth.style.width = `${moveWidth}px`
-      this.$refs.barBtn.style.transform = `translateX(${moveWidth}px)`
+      if (!this.touchs.initStatus) {
+        const barTotal = this.$refs.barTotalWidth
+        let moveWidth = newPercent * barTotal.offsetWidth
+        this.getMoveWidth(moveWidth)
+      }
     }
+  },
+  created () {
+    this.touchs = {}
   }
 }
 </script>
@@ -55,7 +91,6 @@ export default {
         .progress-btn
           position: relative
           top: 7px
-          left: 7px
           box-sizing: border-box
           width: 16px
           height: 16px

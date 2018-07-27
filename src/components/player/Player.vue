@@ -18,11 +18,18 @@
             <!--中部区域-->
             <div class="middle">
                 <div class="middle-l">
-                <div class="cd-wrapper" ref="CDBox">
-                    <div class="cd" :class="cdRotate">
-                    <img class="image" :src="currentSong.image">
-                    </div>
+                  <div class="cd-wrapper" ref="CDBox">
+                      <div class="cd" :class="cdRotate">
+                      <img class="image" :src="currentSong.image">
+                      </div>
+                  </div>
                 </div>
+                <div class="middle-r" ref="lyricCont">
+                  <div class="lyric-wrapper">
+                    <div v-if="currentLyric">
+                      <p class="text" :class="{'current' : currentLineNum === index}" v-for="(line, index) in currentLyric.lines" :key="index">{{ line.txt }}</p>  
+                    </div> 
+                  </div>
                 </div>
             </div>
             <!--下部区域-->
@@ -31,14 +38,14 @@
                 <div class="progress-wrapper">
                   <span class="time time-l">{{ formate(currentPlayTime) }}</span>
                   <div class="progress-bar-wrapper">
-                    <progress-bar :percent="progressBarPercent"></progress-bar>
+                    <progress-bar :percent="progressBarPercent" @dragmove="onDragMove"></progress-bar>
                   </div>
                   <span class="time time-r">{{ formate(currentSong.duration) }}</span>
                 </div>
                 <!--音乐播放操作区域-->
                 <div class="operators">
                 <div class="icon i-left">
-                    <i class="icon-sequence"></i>
+                    <i :class="modeIcon" @click="selectPlayMode"></i>
                 </div>
                 <div class="icon i-left" :class="disable">
                     <i class="icon-prev" @click="togglePrev"></i>
@@ -74,7 +81,7 @@
         </div>
         </div>
     </transition>
-    <audio ref="musicPlay" :src="currentSong.url" @canplay="ready" @error="onError" @timeupdate="updateTime"></audio>
+    <audio ref="musicPlay" :src="currentSong.url" @canplay="ready" @error="onError" @timeupdate="updateTime" @ended="musicEnd"></audio>
   </div>
 </template>
 
@@ -82,11 +89,17 @@
 import {mapGetters, mapMutations} from 'vuex'
 import animations from 'create-keyframe-animation'
 import ProgressBar from 'base/progress-bar/progress-bar'
+import {shuffle} from 'common/js/util'
+import Lyric from 'lyric-parser'
+import Bscroll from 'better-scroll'
+
 export default {
   data () {
     return {
       musicReady: false,
-      currentPlayTime: 0
+      currentPlayTime: 0,
+      currentLyric: null,
+      currentLineNum: 0
     }
   },
   components: {
@@ -111,18 +124,27 @@ export default {
     progressBarPercent () {
       return this.currentPlayTime / this.currentSong.duration
     },
+    modeIcon () {
+      return this.mode === 0 ? 'icon-sequence' : this.mode === 1 ? 'icon-loop' : 'icon-random'
+    },
     ...mapGetters([
       'fullScreen',
       'playlist',
       'currentSong',
       'playing',
-      'currentIndex'
+      'currentIndex',
+      'mode',
+      'sequenceList'
     ])
   },
   watch: {
-    currentSong () {
+    currentSong (newSong, oldSong) {
+      if (newSong.id === oldSong.id) {
+        return
+      }
       this.$nextTick(() => {
         this.$refs.musicPlay.play()
+        this.getLyrics()
       })
     }
   },
@@ -163,6 +185,10 @@ export default {
       this.setPlaying(true)
       this.musicReady = false
     },
+    toggleLoop () {
+      this.$refs.musicPlay.currentTime = 0
+      this.$refs.musicPlay.play()
+    },
     ready () {
       this.musicReady = true
     },
@@ -171,6 +197,25 @@ export default {
     },
     updateTime (e) {
       this.currentPlayTime = e.target.currentTime
+    },
+    musicEnd () {
+      if (this.mode === 1) {
+        this.toggleLoop()
+      } else {
+        this.toggleNext()
+      }
+    },
+    getLyrics () {
+      this.currentSong.getLyric().then((res) => {
+        this.currentLyric = new Lyric(res, this.handlerLyric)
+        if (this.playing) {
+          this.currentLyric.play()
+        }
+        console.log(this.currentLyric)
+      })
+    },
+    handlerLyric ({lineNum, txt}) {
+      this.currentLineNum = lineNum
     },
     formate (time) {
       time = time | 0
@@ -185,6 +230,30 @@ export default {
         len++
       }
       return num
+    },
+    onDragMove (precent) {
+      this.$refs.musicPlay.currentTime = precent * this.currentSong.duration
+      if (!this.playing) {
+        this.togglePlay()
+      }
+    },
+    selectPlayMode () {
+      let selMode = (this.mode + 1) % 3
+      this.setMode(selMode)
+      let list = null
+      if (this.mode === 2) {
+        list = shuffle(this.sequenceList)
+      } else {
+        list = this.sequenceList
+      }
+      this.resetCurrentIndex(list)
+      this.setPlaylist(list)
+    },
+    resetCurrentIndex (list) {
+      let index = list.findIndex((item) => {
+        return item.id === this.currentSong.id
+      })
+      this.setCurrentIndex(index)
     },
     enter (el, done) {
       let {x, y, scale} = this.getAnimatePos()
@@ -259,10 +328,13 @@ export default {
     ...mapMutations({
       setFullScreen: 'SET_FULL_SCREEN',
       setPlaying: 'SET_PLAYING_STATE',
-      setCurrentIndex: 'SET_CURRENT_INDEX'
+      setCurrentIndex: 'SET_CURRENT_INDEX',
+      setMode: 'SET_PLAY_MODE',
+      setPlaylist: 'SET_PLAYLIST'
     })
   },
   mounted () {
+    this.scroll = new Bscroll(this.$refs.lyricCont)
     console.log(this.getAnimatePos())
   }
 }
@@ -417,7 +489,7 @@ export default {
             &.time-r
               text-align right
           .progress-bar-wrapper
-            padding 0 5px
+            padding 0 10px
             flex 1
         .operators
           display flex
