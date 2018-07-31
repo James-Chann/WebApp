@@ -12,9 +12,9 @@
     <router-link tag="div" to="/latest" class="tab-item tab-latest">
       <div class="tab-link">歌单</div>
     </router-link>
-    <!-- <router-link tag="div" to="/search" class="tab-item tab-search">
+    <router-link tag="div" to="/search" class="tab-item tab-search">
       <div class="tab-link">搜索</div>
-    </router-link> -->
+    </router-link>
   </div>
 </template>
 

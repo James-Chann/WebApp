@@ -75,7 +75,6 @@ export default {
     getLatestSucc(res) {
       if (res.code === ERR_OK) {
         this.songList = res.songlist
-        console.log(this.songList)
       }
     }
   },

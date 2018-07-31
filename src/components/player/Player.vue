@@ -17,6 +17,8 @@
             </div>
             <!--中部区域-->
             <div class="middle">
+              <swiper :options="swiperOption">
+                <swiper-slide>
                 <div class="middle-l">
                   <div class="cd-wrapper" ref="CDBox">
                       <div class="cd" :class="cdRotate">
@@ -24,16 +26,27 @@
                       </div>
                   </div>
                 </div>
+                </swiper-slide>
+                <swiper-slide>
                 <div class="middle-r" ref="lyricCont">
                   <div class="lyric-wrapper">
                     <div v-if="currentLyric">
-                      <p class="text" :class="{'current' : currentLineNum === index}" v-for="(line, index) in currentLyric.lines" :key="index">{{ line.txt }}</p>  
-                    </div> 
+                      <p class="text" ref="lyricLine" :class="{'current' : currentLineNum === index}" v-for="(line, index) in currentLyric.lines" :key="index">{{ line.txt }}</p>
+                    </div>
                   </div>
                 </div>
+                </swiper-slide>
+                <!-- Optional controls -->
+                <div class="swiper-pagination"  slot="pagination"></div>
+              </swiper>
             </div>
             <!--下部区域-->
             <div class="bottom">
+                <!--下部切换按点-->
+                <!-- <div class="dot-wrapper">
+                  <span class="dot" :class="{'active':currentShow==='cd'}"></span>
+                  <span class="dot" :class="{'active':currentShow==='lyric'}"></span>
+                </div> -->
                 <!--音乐播放进度条-->
                 <div class="progress-wrapper">
                   <span class="time time-l">{{ formate(currentPlayTime) }}</span>
@@ -99,7 +112,11 @@ export default {
       musicReady: false,
       currentPlayTime: 0,
       currentLyric: null,
-      currentLineNum: 0
+      currentLineNum: 0,
+      currentShow: 'cd',
+      swiperOption: {
+        pagination: '.swiper-pagination'
+      }
     }
   },
   components: {
@@ -211,11 +228,16 @@ export default {
         if (this.playing) {
           this.currentLyric.play()
         }
-        console.log(this.currentLyric)
       })
     },
     handlerLyric ({lineNum, txt}) {
       this.currentLineNum = lineNum
+      if (lineNum > 5) {
+        let Lyricpos = this.$refs.lyricLine[lineNum - 5]
+        this.scroll.scrollToElement(Lyricpos, 1000)
+      } else {
+        this.scroll.scrollToElement(0, 0, 1000)
+      }
     },
     formate (time) {
       time = time | 0
@@ -333,6 +355,9 @@ export default {
       setPlaylist: 'SET_PLAYLIST'
     })
   },
+  created () {
+    this.touch = {}
+  },
   mounted () {
     this.scroll = new Bscroll(this.$refs.lyricCont)
     console.log(this.getAnimatePos())
@@ -395,6 +420,7 @@ export default {
         top 80px
         bottom 170px
         white-space nowrap
+        overflow hidden
         font-size 0
         .middle-l
           display inline-block

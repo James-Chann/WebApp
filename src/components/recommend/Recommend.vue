@@ -26,7 +26,7 @@
           <h1 class="list-title">热门歌单推荐</h1>
           <!--歌单内容，列表循环-->
           <ul class="list-cont">
-            <li class="list-cont-item" v-for="(item, index) in songList" :key="index">
+            <li class="list-cont-item" @click="detailClickHandler(item)" v-for="(item, index) in songList" :key="index">
               <div class="item-left">
                 <img class="left-img" v-lazy="item.imgurl" alt="">
               </div>
@@ -44,6 +44,7 @@
       </div>
       <!--滑动结束-->
     </div>
+    <router-view></router-view>
   </div>
 </template>
 
@@ -52,6 +53,7 @@ import Bscroll from 'better-scroll'
 import Loading from 'base/loading/loading'
 import {getRecommend, getDiscList} from 'api/recommend'
 import {ERR_OK} from 'api/config'
+import {mapMutations} from 'vuex'
 export default {
   name: 'Recommend',
   components: {
@@ -83,7 +85,16 @@ export default {
       if (res.code === ERR_OK) {
         this.songList = res.data.list
       }
-    }
+    },
+    detailClickHandler (item) {
+      this.$router.push({
+        path: `/recommend/${item.dissid}`
+      })
+      this.setDisc(item)
+    },
+    ...mapMutations({
+      setDisc: 'SET_DISC'
+    })
   },
   created () {
     getRecommend().then(this.getRecommendSucc)
