@@ -23,6 +23,9 @@ export default {
   methods: {
     clear () {
       this.query = ''
+    },
+    setQuery (query) {
+      this.query = query
     }
   },
   created () {
