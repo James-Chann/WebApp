@@ -1,6 +1,6 @@
-# WebApp-Music
+# WebApp
 
-> 音乐播放器
+> APP
 
 ## Build Setup
 
